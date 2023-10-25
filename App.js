@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import {
   Button,
+  Keyboard,
   Pressable,
   StyleSheet,
   Text,
@@ -39,7 +40,7 @@ function Square({ value, onSquareClick, onBgCheck }) {
     </Pressable>
   );
 }
-NavigationBar.setBackgroundColorAsync("#c9c9c9");
+NavigationBar.setBackgroundColorAsync("#dedede");
 export default function App() {
   const [squares, setSquares] = useState(Array(9).fill(null));
   const [check, setCheck] = useState(true);
@@ -64,6 +65,7 @@ export default function App() {
     return null;
   }
   function calculateWinner(squares) {
+    let i;
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -74,7 +76,7 @@ export default function App() {
       [0, 4, 8],
       [2, 4, 6],
     ];
-    for (let i = 0; i < lines.length; i++) {
+    for (i = 0; i < lines.length; i++) {
       const [a, b, c] = lines[i];
       if (
         squares[a] &&
@@ -84,10 +86,15 @@ export default function App() {
         return squares[a];
       }
     }
+    // if (i === lines.length) {
+    //   return "XO";
+    // } else {
     return null;
+    // }
   }
 
   function handleClick(index) {
+    Keyboard.dismiss();
     if (squares[index] || calculateWinner(squares) || !player1 || !player2)
       return;
     const nextSquares = squares.slice();
@@ -107,134 +114,145 @@ export default function App() {
   const winner = calculateWinner(squares);
   let status;
   if (player1 && player2) {
-    if (winner) {
-      status = "Winner: " + (winner === "X" ? player1 : player2);
+    if (!squares.includes(null)) {
+      status = "Its a draw!";
     } else {
-      status = "Next Turn: " + (check ? player1 : player2);
+      if (winner) {
+        status = "Winner is " + (winner === "X" ? player1 : player2) + "!";
+      } else {
+        status = "Next Turn: " + (check ? player1 : player2);
+      }
     }
   } else {
-    status = "Write player names to start";
+    status = "write your names to start";
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.playerWrapper}>
-        <View style={styles.player}>
-          {/* <Text style={[styles.playerLabel, { backgroundColor: "orangered" }]}>
+    <>
+      <View style={styles.container}>
+        <View style={styles.playerWrapper}>
+          <View style={styles.player}>
+            {/* <Text style={[styles.playerLabel, { backgroundColor: "orangered" }]}>
             X
           </Text> */}
-          <TextInput
-            style={[styles.playerInput, { backgroundColor: "orangered" }]}
-            value={player1}
-            placeholder="Player X"
-            spellCheck={false}
-            onChangeText={(e) => setPlayer1(e)}
-          />
-        </View>
-        <View style={styles.player}>
-          {/* <Text style={[styles.playerLabel, { backgroundColor: "teal" }]}>
+            <TextInput
+              style={[styles.playerInput, { backgroundColor: "orangered" }]}
+              value={player1}
+              placeholder="Player X"
+              spellCheck={false}
+              onChangeText={(e) => setPlayer1(e)}
+            />
+          </View>
+          <View style={styles.player}>
+            {/* <Text style={[styles.playerLabel, { backgroundColor: "teal" }]}>
             O
           </Text> */}
-          <TextInput
-            style={[styles.playerInput, { backgroundColor: "teal" }]}
-            value={player2}
-            placeholder="Player O"
-            spellCheck={false}
-            onChangeText={(e) => setPlayer2(e)}
-          />
+            <TextInput
+              style={[styles.playerInput, { backgroundColor: "teal" }]}
+              value={player2}
+              placeholder="Player O"
+              spellCheck={false}
+              onChangeText={(e) => setPlayer2(e)}
+            />
+          </View>
+          <View style={styles.status}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "Poppins_400Regular",
+              }}
+            >
+              {status}
+            </Text>
+          </View>
         </View>
-        <View style={styles.status}>
-          <Text
-            style={{
-              fontSize: 12,
-              fontFamily: "Poppins_400Regular",
-            }}
-          >
-            {status}
-          </Text>
+        <View style={styles.board}>
+          <View style={styles.boardRow}>
+            <Square
+              value={squares[0]}
+              onSquareClick={() => handleClick(0)}
+              onBgCheck={background[0]}
+            />
+            <Square
+              value={squares[1]}
+              onSquareClick={() => handleClick(1)}
+              onBgCheck={background[1]}
+            />
+            <Square
+              value={squares[2]}
+              onSquareClick={() => handleClick(2)}
+              onBgCheck={background[2]}
+            />
+          </View>
+          <View style={styles.boardRow}>
+            <Square
+              value={squares[3]}
+              onSquareClick={() => handleClick(3)}
+              onBgCheck={background[3]}
+            />
+            <Square
+              value={squares[4]}
+              onSquareClick={() => handleClick(4)}
+              onBgCheck={background[4]}
+            />
+            <Square
+              value={squares[5]}
+              onSquareClick={() => handleClick(5)}
+              onBgCheck={background[5]}
+            />
+          </View>
+          <View style={styles.boardRow}>
+            <Square
+              value={squares[6]}
+              onSquareClick={() => handleClick(6)}
+              onBgCheck={background[6]}
+            />
+            <Square
+              value={squares[7]}
+              onSquareClick={() => handleClick(7)}
+              onBgCheck={background[7]}
+            />
+            <Square
+              value={squares[8]}
+              onSquareClick={() => handleClick(8)}
+              onBgCheck={background[8]}
+            />
+          </View>
+          <View style={styles.resetWrapper}>
+            <Pressable
+              onPress={() => {
+                setSquares(Array(9).fill(null));
+                setBackground(Array(9).fill("#ededed"));
+              }}
+            >
+              <Text
+                style={[
+                  styles.reset,
+                  squares.some((element) => element !== null) &&
+                    styles.resetActive,
+                ]}
+              >
+                Reset
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
-      <View style={styles.board}>
-        <View style={styles.boardRow}>
-          <Square
-            value={squares[0]}
-            onSquareClick={() => handleClick(0)}
-            onBgCheck={background[0]}
-          />
-          <Square
-            value={squares[1]}
-            onSquareClick={() => handleClick(1)}
-            onBgCheck={background[1]}
-          />
-          <Square
-            value={squares[2]}
-            onSquareClick={() => handleClick(2)}
-            onBgCheck={background[2]}
-          />
-        </View>
-        <View style={styles.boardRow}>
-          <Square
-            value={squares[3]}
-            onSquareClick={() => handleClick(3)}
-            onBgCheck={background[3]}
-          />
-          <Square
-            value={squares[4]}
-            onSquareClick={() => handleClick(4)}
-            onBgCheck={background[4]}
-          />
-          <Square
-            value={squares[5]}
-            onSquareClick={() => handleClick(5)}
-            onBgCheck={background[5]}
-          />
-        </View>
-        <View style={styles.boardRow}>
-          <Square
-            value={squares[6]}
-            onSquareClick={() => handleClick(6)}
-            onBgCheck={background[6]}
-          />
-          <Square
-            value={squares[7]}
-            onSquareClick={() => handleClick(7)}
-            onBgCheck={background[7]}
-          />
-          <Square
-            value={squares[8]}
-            onSquareClick={() => handleClick(8)}
-            onBgCheck={background[8]}
-          />
-        </View>
-        <View style={styles.resetWrapper}>
-          <Pressable
-            style={[
-              styles.reset,
-              squares.some((element) => element !== null) && styles.resetActive,
-            ]}
-            onPress={() => {
-              setSquares(Array(9).fill(null));
-              setBackground(Array(9).fill("white"));
-            }}
-          >
-            <Text style={{ color: "red" }}>Reset</Text>
-          </Pressable>
-        </View>
-      </View>
-    </View>
+      <StatusBar />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#c9c9c9",
+    backgroundColor: "#dedede",
     alignItems: "center",
     justifyContent: "space-evenly",
   },
   square: {
     color: "#fff",
     height: 50,
-    elevation: 1,
+    // elevation: 1,
     borderRadius: 7,
     alignItems: "center",
     justifyContent: "center",
@@ -254,7 +272,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_500Medium",
     textAlign: "center",
     color: "#fff",
-    elevation: 1,
+    // elevation: 1,
     paddingVertical: 5,
     paddingHorizontal: 10,
     minWidth: "30%",
@@ -277,7 +295,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   reset: {
+    fontSize: 14,
+    fontFamily: "Poppins_400Regular",
+    color: "#888",
+  },
+  resetActive: {
     color: "red",
   },
-  resetActive: {},
 });
